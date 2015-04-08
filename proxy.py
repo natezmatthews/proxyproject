@@ -32,22 +32,8 @@ class Server:
         print "hello"
         cli_sockfd, cli_addr = self.server.accept()
         print cli_addr, "has connected"
-
-        
-
-
-        # self.data = self.server.recv(BUFFER_SIZE)
-
-        # print self.data
-
-
-
-
-
-    # def main_loop(self):
-    #     while 1:
-
-
+        self.data = cli_sockfd.recv(BUFFER_SIZE)
+        print self.data
 
 if __name__ == '__main__':
     try:

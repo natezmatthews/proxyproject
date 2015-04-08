@@ -1,7 +1,17 @@
 import sys
 import urllib2
+import socket
 
-req = urllib2.Request(sys.argv[1])
-response = urllib2.urlopen(req)
-the_page = response.read()
-print the_page
+BUFFER_SIZE = 4096
+
+HOST = sys.argv[1]
+PORT = int(sys.argv[2])
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST,PORT))
+
+req = ("GET " + sys.argv[3] + " HTTP/1.1")
+print req
+s.send(req)
+response = s.recv(BUFFER_SIZE)
+print response
