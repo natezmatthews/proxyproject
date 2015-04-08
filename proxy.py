@@ -6,17 +6,17 @@ import select
 NUM_CLIENTS = 5
 BUFFER_SIZE = 4096
 
-class Forward:
-    def __init__(self):
-        self.forward = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# class Forward:
+#     def __init__(self):
+#         self.forward = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
  
-    def start(self, host, port):
-        try:
-            self.forward.connect((host, port))
-            return self.forward
-        except Exception, e:
-            print e
-            return False
+#     def start(self, host, port):
+#         try:
+#             self.forward.connect((host, port))
+#             return self.forward
+#         except Exception, e:
+#             print e
+#             return False
 
 
 class Server:
@@ -33,23 +33,34 @@ class Server:
         cli_sockfd, cli_addr = self.server.accept()
         print cli_addr, "has connected"
         self.data = cli_sockfd.recv(BUFFER_SIZE)
-        print self.data
+        return self.data
 
 if __name__ == '__main__':
     try:
-        if len(sys.argv) == 3:
-            hostname = sys.argv[1]
-            portno = int(sys.argv[2])
-
-            print hostname, portno
-            server = Server(hostname, portno)
-            server.readFromClient()
-
-
-
-        else:
+        if len(sys.argv) != 3:
             print "Please specify port number"
             sys.exit(1)
+        hostname = sys.argv[1]
+        portno = int(sys.argv[2])
+        print hostname, portno
+        server = Server(hostname, portno)
+        req = server.readFromClient()
+        elems = req.split()
+        for a in elems:
+            print a
+        dest = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            print "Here?"
+            dest.connect((elems[4], 80))
+            print "Here1?"
+            print dest.send(req)
+        except Exception, e:
+            print e
+        try:
+            print dest.recv(BUFFER_SIZE)
+        except Exception, e:
+            print e
+
            
     except KeyboardInterrupt:
         print "Ctrl C - Stopping server"
