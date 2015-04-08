@@ -50,14 +50,9 @@ if __name__ == '__main__':
             print a
         dest = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            print "Here?"
             dest.connect((elems[4], 80))
-            print "Here1?"
-            print dest.send(req)
-        except Exception, e:
-            print e
-        try:
-            print dest.recv(BUFFER_SIZE)
+            dest.send(req)
+            document = dest.recv(BUFFER_SIZE)
         except Exception, e:
             print e
 
