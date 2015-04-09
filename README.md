@@ -1,6 +1,6 @@
 # proxyproject 
-#### COMP112 Networks and Protocols
-#### Assignment #5
+#### COMP112 Networks and Protocols, Assignment #5
+Nate Matthews and Lucy Qin
 
 ##### PROJECT DESCRIPTION
 The proxy takes in a GET request from a client and then retrieves the 
