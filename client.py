@@ -13,5 +13,7 @@ s.connect((HOST,PORT))
 req = ("GET / HTTP/1.1\nHost: example.com\r\n\r\n")
 print req
 s.send(req)
-response = s.recv(BUFFER_SIZE)
-print response
+while 1:
+	response = s.recv(BUFFER_SIZE)
+	if len(response) > 0:
+		print response

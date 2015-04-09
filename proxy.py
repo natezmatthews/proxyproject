@@ -1,11 +1,15 @@
+# proxy.py
+# COMP 112 Project 5
+# Lucy Qin and Nate Matthews
+
 import socket
-import time
 import sys
 import select
 
 NUM_CLIENTS = 1
 BUFFER_SIZE = 4096
 
+# Server class handles communication with the client
 class Server:
     def __init__(self, host, port):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,6 +21,10 @@ class Server:
         self.data = cli_sockfd.recv(BUFFER_SIZE)
         return self.data
 
+    def sendToClient(self, data):
+        self.server.send(data)
+
+# Client class handles communication with the destination server
 class Client:
     def __init__(self, host, port):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,8 +41,10 @@ class Client:
             if len(read) == 0:
                 break
             resp += read
-        print findLinks(resp)
+        findLinks(resp)
+        return resp
 
+# findLinks function finds all HTML links in a document
 def findLinks(document):
     linkstr = "<a href="
     searchfrom = 0
@@ -64,7 +74,8 @@ if __name__ == '__main__':
         
         elems = req.split()
         client = Client(elems[4], 80)
-        client.communicate(req)
+        resp = client.communicate(req)
+        server.sendToClient(resp)
 
     except KeyboardInterrupt:
         print "Ctrl C - Stopping server"
