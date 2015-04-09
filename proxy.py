@@ -17,12 +17,12 @@ class Server:
         self.server.listen(NUM_CLIENTS)
 
     def readFromClient(self):
-        cli_sockfd, cli_addr = self.server.accept()
-        self.data = cli_sockfd.recv(BUFFER_SIZE)
+        self.cli_sockfd, cli_addr = self.server.accept()
+        self.data = self.cli_sockfd.recv(BUFFER_SIZE)
         return self.data
 
     def sendToClient(self, data):
-        self.server.send(data)
+        self.cli_sockfd.send(data)
 
 # Client class handles communication with the destination server
 class Client:
