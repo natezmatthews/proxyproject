@@ -33,8 +33,10 @@ class Client:
         except Exception, e:
             print e
 
-    def communicate(self, data):
+    def sendToServer(self, data):
         self.client.send(data)
+    
+    def readFromServer(self):
         resp = ''
         while 1:
             read = self.client.recv(BUFFER_SIZE)
@@ -74,7 +76,8 @@ if __name__ == '__main__':
         
         elems = req.split()
         client = Client(elems[4], 80)
-        resp = client.communicate(req)
+        client.sendToServer(req)
+        resp = readFromServer()
         server.sendToClient(resp)
 
     except KeyboardInterrupt:
