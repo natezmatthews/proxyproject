@@ -69,6 +69,18 @@ def findLinks(document):
         except ValueError:
             break
 
+def forwardAddress(request):
+    elems = request.split()
+    if len(elems) == 0:
+        sys.exit("Error: Request does not contain separatable words")
+    elif elems[0] != "GET":
+        sys.exit("Error: Proxy can only handle HTML GET requests")
+    elif elems[3] == "Host:":
+        return elems[4]
+    else:
+        print elems[4], elems[1]
+        return elems[1]
+
 if __name__ == '__main__':
     try:
         if len(sys.argv) != 3:
@@ -80,10 +92,7 @@ if __name__ == '__main__':
         server = Server(hostname, portno)
         request = server.readFromClient()
         
-        # FIX LATER: For now we assume we are receiving a GET request that has
-        # the destination hostname as its 5th word
-        elems = request.split()
-        client = Client(elems[4], 80)
+        client = Client(forwardAddress(request), 80)
         client.sendToServer(request)
         resp = client.readFromServer()
         server.sendToClient(resp)
