@@ -17,6 +17,24 @@ class Server:
         self.data = cli_sockfd.recv(BUFFER_SIZE)
         return self.data
 
+class Client:
+    def __init__(self, host, port):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            self.client.connect((host, port))
+        except Exception, e:
+            print e
+
+    def communicate(self, data):
+        self.client.send(data)
+        resp = ''
+        while 1:
+            read = self.client.recv(BUFFER_SIZE)
+            if len(read) == 0:
+                break
+            resp += read
+        print findLinks(resp)
+
 def findLinks(document):
     linkstr = "<a href="
     startind = document.find(linkstr) + len(linkstr)
@@ -30,23 +48,13 @@ if __name__ == '__main__':
             sys.exit(1)
         hostname = sys.argv[1]
         portno = int(sys.argv[2])
+        
         server = Server(hostname, portno)
         req = server.readFromClient()
+        
         elems = req.split()
-
-        dest = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            dest.connect((elems[4], 80))
-            dest.send(req)
-        except Exception, e:
-            print e
-        resp = ''
-        while 1:
-            read = dest.recv(BUFFER_SIZE)
-            if len(read) == 0:
-                break
-            resp += read
-        print findLinks(resp)
+        client = Client(elems[4], 80)
+        client.communicate(req)
 
     except KeyboardInterrupt:
         print "Ctrl C - Stopping server"
