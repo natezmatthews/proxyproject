@@ -3,21 +3,23 @@
 Nate Matthews and Lucy Qin
 
 ##### Project Description
-The proxy takes in a GET request from a client and then retrieves the 
-resource. It sends a GET request to the final destination, returns the
-content and upon hovering on a link, it provides hints as to which webpages
-are likely to be faster/slower to download. 
+The proxy listens on a specified port number. If sent an HTTP GET request, the proxy forwards 
+the request to its final destination. The proxy then stores the response, and for each HTML
+link found in the response, the proxy adds a window that will appear on mouseover. These windows
+will contain hints as to which webpages are likely to be faster/slower to download. 
 
-
-
-Providing hints to the user on which links on the webpage are likely to be faster/slower
-to download (based on network latency, available bandwidth, or availability in cache).
-
-
+The hints will be at minimum:
+1. An average round-trip-time calculated by the proxy
+2. The size of the webpage
+Other hints we may implement:
+3. The physical location of the destination server
+4. The availability of the webpage in a cache in the proxy
 
 ##### Current Progress
-The current proxy can handle a single GET request and takes the following
-arguments: proxy host name, proxy port number, destination host name
+The proxy currently forwards the first GET request it gets, stores the response,
+prints out whatever HTML links it finds, and then forwards the response to the client.
+
+Usage: python proxy.py [proxy host name] [proxy port number] [destination host name]
 
 
 
