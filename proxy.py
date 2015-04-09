@@ -50,14 +50,23 @@ if __name__ == '__main__':
             print a
         dest = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            print elems[4]
-            print dest.connect((elems[4], 80))
-            print dest.send(req)
-            print dest.recv(BUFFER_SIZE)
+            dest.connect((elems[4], 80))
+            dest.send(req)
         except Exception, e:
             print e
+        resp = ''
+        while 1:
+            read = dest.recv(BUFFER_SIZE)
+            # if read.find("</html>"):
+            #    break
+            if len(read) == 0:
+                break
+            resp += read
+            print resp
+        linkstr = "<a href="
+        startind = resp.find(linkstr) + len(linkstr)
+        endind = resp.find(resp[startind], startind + 1)
 
-           
     except KeyboardInterrupt:
         print "Ctrl C - Stopping server"
         sys.exit(1)
