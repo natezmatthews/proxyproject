@@ -22,7 +22,7 @@ Other hints we may implement:
 The proxy currently forwards the first GET request it gets, stores the response,
 prints out whatever HTML links it finds in the response, and then forwards the response to the client.
 
-Usage: `python proxy.py [proxy host name] [proxy port number] [destination host name]`
+Usage: `python proxy.py [proxy host name] [proxy port number]`
 
 
 

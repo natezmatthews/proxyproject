@@ -52,32 +52,40 @@ def findLinks(document):
     searchfrom = 0
     while 1:
         try:
+            # Index of the first quotation mark after <a href=
             startind = document.index(linkstr, searchfrom) + len(linkstr)
-            if startind == -1:
+            if startind == -1: # index() returns -1 in the case of an error
                 break
+            # Index of the closing quotation mark for the href value
             endind = document.index(document[startind], startind + 1)
-            if endind == -1:
+            if endind == -1: # index() returns -1 in the case of an error
                 break
+            # Print the values between the quotation marks
             print document[(startind + 1):endind]
+            # In the next iteration of the loop we start the search after the
+            # link just processed:
             searchfrom = endind + 1
+        # index() throws a ValueError if it cannot find the specificied string:
         except ValueError:
             break
 
 if __name__ == '__main__':
     try:
         if len(sys.argv) != 3:
-            print "Usage: " + sys.argv[0] + "[hostname] [port number]"
+            print "Usage: python " + sys.argv[0] + "[hostname] [port number]"
             sys.exit(1)
         hostname = sys.argv[1]
         portno = int(sys.argv[2])
         
         server = Server(hostname, portno)
-        req = server.readFromClient()
+        request = server.readFromClient()
         
-        elems = req.split()
+        # FIX LATER: For now we assume we are receiving a GET request that has
+        # the destination hostname as its 5th word
+        elems = request.split()
         client = Client(elems[4], 80)
-        client.sendToServer(req)
-        resp = readFromServer()
+        client.sendToServer(request)
+        resp = client.readFromServer()
         server.sendToClient(resp)
 
     except KeyboardInterrupt:
