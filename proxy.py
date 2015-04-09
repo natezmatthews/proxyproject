@@ -37,9 +37,19 @@ class Client:
 
 def findLinks(document):
     linkstr = "<a href="
-    startind = document.find(linkstr) + len(linkstr)
-    endind = document.find(document[startind], startind + 1)
-    return document[(startind + 1):endind]
+    searchfrom = 0
+    while 1:
+        try:
+            startind = document.index(linkstr, searchfrom) + len(linkstr)
+            if startind == -1:
+                break
+            endind = document.index(document[startind], startind + 1)
+            if endind == -1:
+                break
+            print document[(startind + 1):endind]
+            searchfrom = endind + 1
+        except ValueError:
+            break
 
 if __name__ == '__main__':
     try:
