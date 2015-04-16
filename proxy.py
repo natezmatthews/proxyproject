@@ -5,6 +5,8 @@
 import socket
 import sys
 import select
+import httplib
+import urlparse
 
 NUM_CLIENTS = 1
 BUFFER_SIZE = 4096
@@ -46,8 +48,15 @@ class Client:
         findLinks(resp)
         return resp
 
+def getPageInfo(uri):
+    conn = httplib.HTTPConnection(urlparse.urlparse(uri).netloc)
+    conn.request("HEAD", uri)
+    res = conn.getresponse()
+    print res.getheader("content-length")
+
 # findLinks function finds all HTML links in a document
 def findLinks(document):
+
     linkstr = "<a href="
     searchfrom = 0
     while 1:
@@ -61,7 +70,7 @@ def findLinks(document):
             if endind == -1: # index() returns -1 in the case of an error
                 break
             # Print the values between the quotation marks
-            print document[(startind + 1):endind]
+            getPageInfo(document[(startind + 1):endind])
             # In the next iteration of the loop we start the search after the
             # link just processed:
             searchfrom = endind + 1
