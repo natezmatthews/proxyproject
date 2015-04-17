@@ -7,6 +7,8 @@ import sys
 import select
 import httplib
 import urlparse
+import pexpect
+from bs4 import BeautifulSoup
 
 NUM_CLIENTS = 1
 BUFFER_SIZE = 4096
@@ -45,38 +47,60 @@ class Client:
             if len(read) == 0:
                 break
             resp += read
-        findLinks(resp)
-        return resp
+        return findLinks(resp)
 
-def getPageInfo(uri):
-    conn = httplib.HTTPConnection(urlparse.urlparse(uri).netloc)
+def contentLength(uri):
+    netloc = urlparse.urlparse(uri).netloc
+    conn = httplib.HTTPConnection(netloc)
     conn.request("HEAD", uri)
     res = conn.getresponse()
-    print res.getheader("content-length")
+    return res.getheader("content-length")
+
+def pingResult(uri):
+    netloc = urlparse.urlparse(uri).netloc
+    try:
+        child = pexpect.spawn('ping -c 5 ' + netloc)
+    except Exception, e:
+        raise e
+    while 1:
+        cur = child.readline()
+        if not cur: break
+        prev = cur
+    return prev
 
 # findLinks function finds all HTML links in a document
 def findLinks(document):
 
-    linkstr = "<a href="
-    searchfrom = 0
-    while 1:
-        try:
-            # Index of the first quotation mark after <a href=
-            startind = document.index(linkstr, searchfrom) + len(linkstr)
-            if startind == -1: # index() returns -1 in the case of an error
-                break
-            # Index of the closing quotation mark for the href value
-            endind = document.index(document[startind], startind + 1)
-            if endind == -1: # index() returns -1 in the case of an error
-                break
-            # Print the values between the quotation marks
-            getPageInfo(document[(startind + 1):endind])
-            # In the next iteration of the loop we start the search after the
-            # link just processed:
-            searchfrom = endind + 1
-        # index() throws a ValueError if it cannot find the specificied string:
-        except ValueError:
-            break
+    # linkstr = "<a href="
+    # searchfrom = 0
+
+    soup = BeautifulSoup(document)
+    for a in soup.findAll('a'):
+        span = soup.new_tag('span')
+        a.replaceWith(span)
+        span.insert(0, a)
+        conlen = contentLength(a['href'])
+        pingres = pingResult(a['href'])
+        span['title'] = conlen + pingres
+    return str(soup)
+
+        # try:
+        #     # Index of the first quotation mark after <a href=
+        #     startind = document.index(linkstr, searchfrom) + len(linkstr)
+        #     if startind == -1: # index() returns -1 in the case of an error
+        #         break
+        #     # Index of the closing quotation mark for the href value
+        #     endind = document.index(document[startind], startind + 1)
+        #     if endind == -1: # index() returns -1 in the case of an error
+        #         break
+        #     # Print the values between the quotation marks
+        #     getPageInfo(document[(startind + 1):endind])
+        #     # In the next iteration of the loop we start the search after the
+        #     # link just processed:
+        #     searchfrom = endind + 1
+        # # index() throws a ValueError if it cannot find the specificied string:
+        # except ValueError:
+        #     break
 
 def forwardAddress(request):
     elems = request.split()
