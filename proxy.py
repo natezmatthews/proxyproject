@@ -68,6 +68,20 @@ def pingResult(uri):
         prev = cur
     return prev
 
+def geoIP(uri):
+    try:
+        conn = httplib.HTTPConnection("freegeoip.net")
+        print "Connection: ", conn
+    except Exception, e:
+        raise e
+    print "Gets out of the try except block"
+    netloc = urlparse.urlparse(uri).netloc
+    print "Performs get on ", netloc
+    conn.request("GET", "/csv/" + netloc)
+    print "done"
+    res = conn.getresponse()
+    return res.read()
+
 # findLinks function finds all HTML links in a document
 def findLinks(document):
 
@@ -81,7 +95,8 @@ def findLinks(document):
         span.insert(0, a)
         conlen = contentLength(a['href'])
         pingres = pingResult(a['href'])
-        span['title'] = conlen + pingres
+        geoip = geoIP(a['href'])
+        span['title'] = conlen + " " + pingres + " " + geoip
     return str(soup)
 
         # try:
