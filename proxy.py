@@ -4,6 +4,7 @@
 
 import socket
 import sys
+import re
 import select
 import httplib
 import urlparse
@@ -30,7 +31,9 @@ class Server:
 
 # Client class handles communication with the destination server
 class Client:
+    permhost = ""
     def __init__(self, host, port):
+        permhost = host
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.client.connect((host, port))
@@ -47,17 +50,15 @@ class Client:
             if len(read) == 0:
                 break
             resp += read
-        return findLinks(resp)
+        return findLinks(resp, host)
 
-def contentLength(uri):
-    netloc = urlparse.urlparse(uri).netloc
+def contentLength(netloc, path):
     conn = httplib.HTTPConnection(netloc)
-    conn.request("HEAD", uri)
+    conn.request("HEAD", netloc + path)
     res = conn.getresponse()
     return res.getheader("content-length")
 
-def pingResult(uri):
-    netloc = urlparse.urlparse(uri).netloc
+def pingResult(netloc):
     try:
         child = pexpect.spawn('ping -c 5 ' + netloc)
     except Exception, e:
@@ -68,22 +69,18 @@ def pingResult(uri):
         prev = cur
     return prev
 
-def geoIP(uri):
+def geoIP(netloc):
     try:
         conn = httplib.HTTPConnection("freegeoip.net")
         print "Connection: ", conn
     except Exception, e:
         raise e
-    print "Gets out of the try except block"
-    netloc = urlparse.urlparse(uri).netloc
-    print "Performs get on ", netloc
     conn.request("GET", "/csv/" + netloc)
-    print "done"
     res = conn.getresponse()
     return res.read()
 
 # findLinks function finds all HTML links in a document
-def findLinks(document):
+def findLinks(document, hostname):
 
     # linkstr = "<a href="
     # searchfrom = 0
@@ -93,9 +90,13 @@ def findLinks(document):
         span = soup.new_tag('span')
         a.replaceWith(span)
         span.insert(0, a)
-        conlen = contentLength(a['href'])
-        pingres = pingResult(a['href'])
-        geoip = geoIP(a['href'])
+        parsed = urlparse.urlparse(a['href'])
+        netloc = parsed.netloc
+        if netloc == "":
+            netloc = hostname
+        conlen = contentLength(netloc, parsed.path)
+        pingres = pingResult(netloc)
+        geoip = geoIP(netloc)
         span['title'] = conlen + " " + pingres + " " + geoip
     return str(soup)
 
@@ -139,11 +140,12 @@ if __name__ == '__main__':
         
         server = Server(hostname, portno)
         request = server.readFromClient()
+        print re.findall(r"(?P<name>.*?): (?P<value>.*?)\r\n", request)
         
-        client = Client(forwardAddress(request), 80)
-        client.sendToServer(request)
-        resp = client.readFromServer()
-        server.sendToClient(resp)
+        # client = Client(forwardAddress(request), 80)
+        # client.sendToServer(request)
+        # resp = client.readFromServer()
+        # server.sendToClient(resp)
 
     except KeyboardInterrupt:
         print "Ctrl C - Stopping server"
