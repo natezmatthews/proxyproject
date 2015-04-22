@@ -4,7 +4,6 @@
 
 import socket
 import sys
-import re
 import select
 import httplib
 import urlparse
@@ -31,9 +30,9 @@ class Server:
 
 # Client class handles communication with the destination server
 class Client:
-    permhost = ""
     def __init__(self, host, port):
-        permhost = host
+        self.permhost = host
+        print "Permhost: ", self.permhost
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.client.connect((host, port))
@@ -50,7 +49,7 @@ class Client:
             if len(read) == 0:
                 break
             resp += read
-        return findLinks(resp, host)
+        return findLinks(resp, self.permhost)
 
 def contentLength(netloc, path):
     conn = httplib.HTTPConnection(netloc)
@@ -140,12 +139,11 @@ if __name__ == '__main__':
         
         server = Server(hostname, portno)
         request = server.readFromClient()
-        print re.findall(r"(?P<name>.*?): (?P<value>.*?)\r\n", request)
         
-        # client = Client(forwardAddress(request), 80)
-        # client.sendToServer(request)
-        # resp = client.readFromServer()
-        # server.sendToClient(resp)
+        client = Client(forwardAddress(request), 80)
+        client.sendToServer(request)
+        resp = client.readFromServer()
+        server.sendToClient(resp)
 
     except KeyboardInterrupt:
         print "Ctrl C - Stopping server"
