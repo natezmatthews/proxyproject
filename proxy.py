@@ -82,13 +82,13 @@ def getLinkInfo(uri, hostname):
     print "parsed.netloc: ", parsed.netloc
     print "netloc: ", netloc
     print "parsed.path: ", parsed.path
-    path = parsed.path
-    if path and (path[0] != '/'):
-        path = '/' + path
+    # path = parsed.path
+    # if path and (path[0] != '/'):
+    #     path = '/' + path
 
     conn = httplib.HTTPConnection(netloc)
     try:
-        conn.request("HEAD", netloc + path)
+        conn.request("HEAD", uri)
         res = conn.getresponse()
     except Exception, e:
         return "Error: " + str(e)
@@ -101,7 +101,7 @@ def getLinkInfo(uri, hostname):
         print "Pingres? ", pingres
         geoip = geoIP(netloc)
         print "Geoip? ", geoip
-        return "Content length: " + conlen + " bytes\nping " + pingres + "\n" + geoip
+        return "Content length: " + conlen + " bytes\nping " + pingres + geoip
     else:
         return "Error: HTTP Status " + str(res.status)
 
