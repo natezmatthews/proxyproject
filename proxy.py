@@ -4,6 +4,7 @@
 
 import socket
 import sys
+import json
 import select
 import httplib
 import urlparse
@@ -51,12 +52,6 @@ class Client:
             resp += read
         return findLinks(resp, self.permhost)
 
-def contentLength(netloc, path):
-    conn = httplib.HTTPConnection(netloc)
-    conn.request("HEAD", netloc + path)
-    res = conn.getresponse()
-    return res.getheader("content-length")
-
 def pingResult(netloc):
     try:
         child = pexpect.spawn('ping -c 5 ' + netloc)
@@ -71,51 +66,54 @@ def pingResult(netloc):
 def geoIP(netloc):
     try:
         conn = httplib.HTTPConnection("freegeoip.net")
-        print "Connection: ", conn
     except Exception, e:
         raise e
     conn.request("GET", "/csv/" + netloc)
     res = conn.getresponse()
     return res.read()
 
+def getLinkInfo(uri, hostname):
+    parsed = urlparse.urlparse(uri)
+    netloc = parsed.netloc
+    if netloc == "":
+        netloc = hostname
+
+    print "uri: ", uri
+    print "parsed.netloc: ", parsed.netloc
+    print "netloc: ", netloc
+    print "parsed.path: ", parsed.path
+    path = parsed.path
+    if path and (path[0] != '/'):
+        path = '/' + path
+
+    conn = httplib.HTTPConnection(netloc)
+    try:
+        conn.request("HEAD", netloc + path)
+        res = conn.getresponse()
+    except Exception, e:
+        return "Error: " + str(e)
+    if (res.status == 200) or (res.status == 304):
+        conlen = res.getheader("content-length")
+        print "Conlen? ", conlen
+        if not conlen:
+            conlen = "<Not found>"
+        pingres = pingResult(netloc)
+        print "Pingres? ", pingres
+        geoip = geoIP(netloc)
+        print "Geoip? ", geoip
+        return "Content length: " + conlen + " bytes\nping " + pingres + "\n" + geoip
+    else:
+        return "Error: HTTP Status " + str(res.status)
+
 # findLinks function finds all HTML links in a document
 def findLinks(document, hostname):
-
-    # linkstr = "<a href="
-    # searchfrom = 0
-
     soup = BeautifulSoup(document)
     for a in soup.findAll('a'):
         span = soup.new_tag('span')
         a.replaceWith(span)
         span.insert(0, a)
-        parsed = urlparse.urlparse(a['href'])
-        netloc = parsed.netloc
-        if netloc == "":
-            netloc = hostname
-        conlen = contentLength(netloc, parsed.path)
-        pingres = pingResult(netloc)
-        geoip = geoIP(netloc)
-        span['title'] = conlen + " " + pingres + " " + geoip
+        span['title'] = getLinkInfo(a['href'], hostname)
     return str(soup)
-
-        # try:
-        #     # Index of the first quotation mark after <a href=
-        #     startind = document.index(linkstr, searchfrom) + len(linkstr)
-        #     if startind == -1: # index() returns -1 in the case of an error
-        #         break
-        #     # Index of the closing quotation mark for the href value
-        #     endind = document.index(document[startind], startind + 1)
-        #     if endind == -1: # index() returns -1 in the case of an error
-        #         break
-        #     # Print the values between the quotation marks
-        #     getPageInfo(document[(startind + 1):endind])
-        #     # In the next iteration of the loop we start the search after the
-        #     # link just processed:
-        #     searchfrom = endind + 1
-        # # index() throws a ValueError if it cannot find the specificied string:
-        # except ValueError:
-        #     break
 
 def forwardAddress(request):
     elems = request.split()

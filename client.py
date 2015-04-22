@@ -10,7 +10,7 @@ PORT = int(sys.argv[2])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST,PORT))
 
-req = ("GET / HTTP/1.1\nHost: natezmatthews.github.io\r\n\r\n")
+req = ("GET / HTTP/1.1\nHost: lucyq.github.io\r\n\r\n")
 print req
 s.send(req)
 while 1:
