@@ -1,4 +1,3 @@
-
 # proxyproject 
 #### COMP112 Networks and Protocols, Assignment #5
 Nate Matthews and Lucy Qin
@@ -24,7 +23,6 @@ The proxy currently forwards the first GET request it gets, stores the response,
 prints out whatever HTML links it finds in the response, and then forwards the response to the client.
 
 Usage: `python proxy.py [proxy host name] [proxy port number]`
-
 
 
 
