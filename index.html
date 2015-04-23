@@ -1,85 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html 
+ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<!DOCTYPE HTML>
-
+<html lang="en" xml:lang="en">
 <head>
-<title>Networks</title>
-<link href="http://fonts.googleapis.com/css?family=Carrois+Gothic+SC" rel="stylesheet" type="text/css">
-<style>
-        body {
-            padding: 45px;
-            background-color: rgb(80,80,80);
-            text-align: center;
-            font-family: Calibri;
+<title>COMP 112 Assignments</title>
+<link href="style.css" rel="stylesheet" type="text/css"/>
+<meta content="text/javascript" http-equiv="Content-Script-Type"/>
+<script src="/util.js" type="text/javascript">
+</script>
+</head>
+<body>
+<h1>COMP 112 Assignments</h1>
+<div id="topnavbar">
+<ul class="topnavlist">
+<li><span title="Error: HTTP Status 404"><a href="index.html">COMP 112 Home</a></span></li>
+<li><span title="Error: HTTP Status 404"><a href="syllabus.html">Syllabus</a></span></li>
+<li><span title="Error: HTTP Status 404"><a href="assignments.html">Assignments</a></span></li>
+<li><span title="Error: HTTP Status 404"><a href="exams.html">Exams</a></span></li>
+<li><span title="Error: HTTP Status 404"><a href="announcements.html">Announcements</a></span></li>
+<!--<li><a href="project.html">Project</a></li>-->
+</ul>
+</div>
+<p>All assignments will be posted here.</p>
+<table class="assignments">
+<tr>
+<th>Topic</th>
+<th>Assigned</th>
+<th>Due</th>
+<th>Other Info</th>
+<th>Solutions</th>
+</tr>
+<tr>
+<td>Programming: <span title="Error: HTTP Status 404"><a href="handouts/a1.pdf"> Applications - Web Server</a></span></td>
+<td>01/28/2015</td>
+<td>02/09/2015</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Programming: <span title="Error: HTTP Status 404"><a href="assignment-chat.pdf"> Applications - Chat Server</a></span></td>
+<td>02/13/2015</td>
+<td>02/25/2015</td>
+<td><span title="Content length: &lt;Not found&gt; bytes
+ping round-trip min/avg/max/stddev = 51.870/53.478/55.353/1.434 ms
+"><a href="http://www.tutorialspoint.com/unix_system_calls/_newselect.htm">Select help 1<br>
+<span title="Content length: 7033 bytes
+ping round-trip min/avg/max/stddev = 75.029/76.630/77.602/1.141 ms
+"><a href="http://www.beej.us/guide/bgnet/output/html/multipage/selectman.html">Select help 2<br>
+<span title="Content length: 657706 bytes
+ping round-trip min/avg/max/stddev = 21.259/22.373/23.786/1.053 ms
+"><a href="http://www.cs.cmu.edu/~dga/15-441/S08/lectures/03-socket.pdf">Select help 3 (CMU slides)</a></span></br></a></span></br></a></span></td>
+<td></td>
+</tr>
+<tr>
+<td>Programming: <span title="Error: HTTP Status 404"><a href="ReliableUDP.pdf">Reliable file transfer over UDP</a></span></td>
+<td>02/28/2015</td>
+<td>03/09/2015</td>
+<td><span title="Content length: 920 bytes
+ping round-trip min/avg/max/stddev = 85.017/86.504/87.267/1.052 ms
+"><a href="http://www.cs.ucsb.edu/~almeroth/classes/W01.176B/hw2/examples/udp-server.c">Sample server<br>
+<span title="Content length: 795 bytes
+ping round-trip min/avg/max/stddev = 87.588/88.172/89.230/0.749 ms
+"><a href="http://www.cs.ucsb.edu/~almeroth/classes/W01.176B/hw2/examples/udp-client.c">Sample client<br/></a></span></br></a></span></td>
+<td></td>
+</tr>
+<tr>
+<td>Non-Programming: <span title="Error: HTTP Status 404"><a href="Comp112Assignment4.pdf"> Assignment 4</a></span></td>
+<td>03/14/2015</td>
+<td>03/29/2015</td>
+<td>
+<pre>Errata: 3. I. D.
+maximum packets it could send (Answer this part for sources 1 and 2 only)</pre>
+<pre>Errata: 3. II.
+Run the simulator (refer to instructions) and then identify the first loss event in 
+the output trace. Note the exact time and node at which the loss is observed. 
+(Reproduce the corresponding trace line, in addition to your answer)</pre>
+<span title="Error: HTTP Status 403"><a href="scripts.tar">scripts.tar<br>
+<span title="Error: HTTP Status 404"><a href="ns-tutorial.pdf">NS2: Tutorial from IIT<br>
+<span title="Content length: 12942 bytes
+ping round-trip min/avg/max/stddev = 79.400/81.399/82.826/1.456 ms
+"><a href="http://www.isi.edu/nsnam/ns/doc/node387.html">NS2: TCP agents<br>
+<span title="Content length: &l
+t;Not found&gt; bytes
+ping round-trip min/avg/max/stddev = 7.680/9.000/9.701/0.934 ms
+"><a href="http://ns2ultimate.tumblr.com/post/2496927327/post-processing-ns2-result-using-ns2-trace">NS2: Trace file format
+</a></span></br></a></span></br></a></span></br></a></span></td>
+<td></td>
+</tr>
+<tr>
+<td>Project: <span title="Error: HTTP Status 404"><a href="assignment5.pdf"> Assignment 5</a></span></td>
+<td></td>
+<td>first checkpoint  - April 10th<br>demo - April 24th<br>final submission - April 26th</br></br></td>
+<td></td>
+<td></td>
+</tr>
+<!--
+<tr>
+ <td>Tools of the Trade 1:  <a href="ps_ns.html">Simulation with <tt>ns-2</tt> and Routing Table Analysis</a></td>
+ <td>02/14/2007</td>
+ <td>03/05/2007</td>
+ <td></td>
+ <td><a href="ps_tools1_soln.pdf">Solutions</a></td>
+</tr>
 
-        }
+<tr>
+ <td>Theory 2: <a href="ps_theory2.pdf">DNS, DHTs, Multihoming, and Ad-Hoc Wireless Networks</a></td>
+ <td>03/26/2007</td>
+ <td>04/04/2007</td>
+ <td></td>
+ <td><a href="ps_theory2_soln.pdf">Solutions</a></td>
+</tr>
 
-        h1 {
-            font-family: 'Carrois Gothic SC';
-            color: rgb(255, 255,255);
-            text-shadow: 2px 2px #000000;
-
-        }
-
-        a:visited {
-            color: rgb(108,63,105); 
-        }
-
-        a:hover {
-            color: rgb(134,60,77);
-        }
-
-        a {
-            font-size: 18px;
-        }
-
-        h3 {
-            font-family: 'Carrois Gothic SC';
-            text-shadow: 2px 2px #000000;
-            color: white;
-            text-align: center;
-            font-size: 24px;
-
-        }
-
-        #content {
-            padding: 5%;
-            margin-right: 20%;
-            margin-left: 20%;
-            background-color: rgba(255,255,255, 0.2);
-        }
-
-
-    </style>
-</link></head>
-<html>
-<span title="Error: HTTP Status 400"><a href="about.html">About Us</a></span>
-<span title="Error: [Errno 8] nodename nor servname provided, or not known"><a href="http://asdfjsklsklsdl.com"></a></span>Cool page</html> <br>
-<h1>Lucy and Nate's Hub of Networking Info</h1>
-<div id="content">
-<h3>Learn</h3>
-<span title="Content length: 6123 bytes
-ping round-trip min/avg/max/stddev = 4.216/4.504/4.909/0.288 ms
-
-130.64.23.35,US,United States,MA,Massachusetts,Somerville,02144,America/New_York,42.40,-71.12,506
-"><a href="http://www.cs.tufts.edu/comp/112/">Tufts University COMP 112 Course Website</a></span> <br>
-<span title="Content length: 11268615 bytes
-ping round-trip min/avg/max/stddev = 7.262/9.423/14.271/2.720 ms
-
-162.159.241.76,US,United States,CA,California,San Francisco,94107,America/Los_Angeles,37.77,-122.39,807
-"><a href="http://www.saylor.org/site/wp-content/uploads/2012/02/Computer-Networking-Principles-Bonaventure-1-30-31-OTC1.pdf">Computer Networking: Principles, Protocols and Practice (PDF)</a></span> <br>
-<h3>Practice</h3>
-<span title="Content length: 10756 bytes
-ping round-trip min/avg/max/stddev = 74.723/75.127/75.694/0.428 ms
-
-69.163.129.195,US,United States,CA,California,Brea,92821,America/Los_Angeles,33.93,-117.86,803
-"><a href="http://beej.us/guide/bgnet/">Beej's Guide to Network Programming</a></span> <br>
-<span title="Error: HTTP Status 301"><a href="https://docs.python.org/2/howto/sockets.html">Socket Programming Guide for Python</a></span> <br>
-<h3>Laugh</h3>
-<span title="Content length: 7125 bytes
-ping round-trip min/avg/max/stddev = 7.434/8.899/10.190/0.985 ms
-
-107.6.106.82,US,United States,NY,New York,New York,10006,America/New_York,40.71,-74.01,501
-"><a href="https://xkcd.com/350/">xkcd Comic on Networks</a></span>
-<br>
-</br></br></br></br></br></div>
-</br>
+<tr>
+ <td>Tools of the Trade 2:  
+<a href="ps_tools2.pdf">Network measurement with <tt>scriptroute and ruby</tt></a></td>
+ <td>04/09/2007</td>
+ <td>04/18/2007</td>
+ <td></td>
+</tr>
+-->
+</table>
+<!--
+<p>All homework is to be done individually.</p>
+-->
+<hr/>
+<p class="lastupdated">Template Source: <span title="Error: HTTP Status 301"><a href="https://github.com/dave-andersen/coursegen">https://github.com/dave-andersen/coursegen</a></span>
+<p class="lastupdated">Last updated: 2015-04-05 10:10:34 -0400
+ [<span title="Error: HTTP Status 404"><a href="http://validator.w3.org/check?uri=referer">validate xhtml</a></span>]</p>
+</p></body>
+</html>

@@ -7,7 +7,7 @@ import sys
 import json
 import select
 import httplib
-import urlparse
+from urllib.parse import urlparse
 import pexpect
 from bs4 import BeautifulSoup
 
@@ -72,18 +72,21 @@ def geoIP(netloc):
     return res.read()
 
 def getLinkInfo(uri, hostname):
-    parsed = urlparse.urlparse(uri)
+    parsed = urlparse(uri)
     netloc = parsed.netloc
     if netloc == "":
         netloc = hostname
 
-    # print "uri: ", uri
-    # print "parsed.netloc: ", parsed.netloc
-    # print "netloc: ", netloc
-    # print "parsed.path: ", parsed.path
-    # path = parsed.path
-    # if path and (path[0] != '/'):
-    #     path = '/' + path
+    print "uri: ", uri
+    print "parsed.netloc: ", parsed.netloc
+    print "netloc: ", netloc
+    print "parsed.path: ", parsed.path
+    path = parsed.path
+    if path and (path[0] != "/"):
+        uri = "http://" + netloc + "/" + path
+
+    print "URI: ", uri
+    print "Geturl: ", parsed.geturl()
 
     conn = httplib.HTTPConnection(netloc)
     try:
@@ -107,7 +110,7 @@ def getLinkInfo(uri, hostname):
 # findLinks function finds all HTML links in a document
 def findLinks(document, hostname):
     soup = BeautifulSoup(document)
-    for a in soup.findAll('a'):
+    for a in soup.findAll('a', href=True):
         span = soup.new_tag('span')
         a.replaceWith(span)
         span.insert(0, a)
