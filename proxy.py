@@ -4,6 +4,7 @@
 
 import socket
 import sys
+import re
 import json
 import select
 import httplib
@@ -40,7 +41,10 @@ class Client:
         elif elems[3] == "Host:":
             host = elems[4]
             print "Client host: ", host
-            self.fullpath = elems[4] + elems[1]
+            if urlparse.urlparse(elems[1]).netloc == "":
+                self.fullpath = elems[4] + elems[1]
+            else:
+                self.fullpath = elems[1]
             print "Client fullpath: ", self.fullpath
         else:
             host = elems[1]
@@ -88,22 +92,31 @@ def geoIP(netloc):
 
 def getLinkInfo(href, origuri):
     parsed = urlparse.urlparse(href)
+    print "Href:",href
+    print "Origuri:",origuri
     netloc = parsed.netloc
+    print "Netloc:",netloc
     if netloc == "":
         # CASE: Relative URI:
-        parsed_origuri = urlparse.urlparse("http://" + origuri)
+        if re.search("^https?://",origuri) == None:
+            origuri = "http://" + origuri
+        parsed_origuri = urlparse.urlparse(origuri)
         netloc = parsed_origuri.netloc
+        print "Netloc:",netloc
         i = (origuri.index(netloc) + len(netloc))
         k = origuri.rindex("/")
         path = parsed.path
+        print "Path:",path
         # In case the relative URI doesn't have a leading /:
         if path and (path[0] != "/"):
             path = "/" + path
         forreq = origuri[i:k] + path
+        print "Forreq:",forreq
     else:
         # CASE: Absolute URI:
         i = (href.index(netloc) + len(netloc))
         forreq = href[i:]
+        print "Forreq:",forreq
 
     conn = httplib.HTTPConnection(netloc)
     try:
@@ -129,7 +142,6 @@ def findLinks(document, fullpath):
         a.replaceWith(span)
         span.insert(0, a)
         span['title'] = getLinkInfo(a['href'], fullpath)
-        print a, span['title']
     return str(soup)
 
 if __name__ == '__main__':
