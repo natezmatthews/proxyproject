@@ -33,12 +33,11 @@ class Server:
 class Client:
     def __init__(self, host, port):
         self.permhost = host
-        print "Permhost: ", self.permhost
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.client.connect((host, port))
         except Exception, e:
-            print e
+            raise e
 
     def sendToServer(self, data):
         self.client.send(data)
@@ -54,7 +53,7 @@ class Client:
 
 def pingResult(netloc):
     try:
-        child = pexpect.spawn('ping -c 5 ' + netloc)
+        child = pexpect.spawn('ping -c 3 ' + netloc)
     except Exception, e:
         raise e
     while 1:
@@ -78,10 +77,10 @@ def getLinkInfo(uri, hostname):
     if netloc == "":
         netloc = hostname
 
-    print "uri: ", uri
-    print "parsed.netloc: ", parsed.netloc
-    print "netloc: ", netloc
-    print "parsed.path: ", parsed.path
+    # print "uri: ", uri
+    # print "parsed.netloc: ", parsed.netloc
+    # print "netloc: ", netloc
+    # print "parsed.path: ", parsed.path
     # path = parsed.path
     # if path and (path[0] != '/'):
     #     path = '/' + path
@@ -91,17 +90,17 @@ def getLinkInfo(uri, hostname):
         conn.request("HEAD", uri)
         res = conn.getresponse()
     except Exception, e:
-        return "Error: " + str(e)
+        return "Error: Not a valid link"
     if (res.status == 200) or (res.status == 304):
         conlen = res.getheader("content-length")
-        print "Conlen? ", conlen
+        # print "Conlen? ", conlen
         if not conlen:
             conlen = "<Not found>"
         pingres = pingResult(netloc)
-        print "Pingres? ", pingres
-        geoip = geoIP(netloc)
-        print "Geoip? ", geoip
-        return "Content length: " + conlen + " bytes\nping " + pingres + geoip
+        # print "Pingres? ", pingres
+        # geoip = geoIP(netloc)
+        # print "Geoip? ", geoip
+        return "Content length: " + conlen + " bytes\nping " + pingres
     else:
         return "Error: HTTP Status " + str(res.status)
 
