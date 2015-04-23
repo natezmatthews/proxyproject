@@ -86,39 +86,25 @@ def geoIP(netloc):
     res = conn.getresponse()
     return res.read()
 
-def getLinkInfo(uri, origuri):
-    parsed = urlparse.urlparse(uri)
+def getLinkInfo(href, origuri):
+    parsed = urlparse.urlparse(href)
     netloc = parsed.netloc
     print "Netloc:",netloc
     if netloc == "":
         # CASE: Relative URI:
-        parsed2 = urlparse.urlparse("http://" + origuri)
-        netloc = parsed2.netloc
-        print "Updated netloc:",netloc
+        parsed_origuri = urlparse.urlparse("http://" + origuri)
+        netloc = parsed_origuri.netloc
         i = (origuri.index(netloc) + len(netloc))
         k = origuri.rindex("/")
-        print "i, k:",i,k
         path = parsed.path
+        # In case the relative URI doesn't have a leading /:
         if path and (path[0] != "/"):
             path = "/" + path
         forreq = origuri[i:k] + path
-        print "Forreq:",forreq
     else:
         # CASE: Absolute URI:
-        i = (uri.index(netloc) + len(netloc))
-        print "i:",i
-        forreq = uri[i:]
-        print "Forreq:",forreq
-    
-    # print "parsed.path: ", parsed.path
-    # path = parsed.path
-    # if path:
-    #     uri = "http://" + dapath
-    #     if(path[0] != "/"):
-    #         uri += "/"
-    #     uri += path
-
-    # print "HeadReq: ", uri
+        i = (href.index(netloc) + len(netloc))
+        forreq = href[i:]
 
     conn = httplib.HTTPConnection(netloc)
     try:
@@ -128,14 +114,11 @@ def getLinkInfo(uri, origuri):
         return "Error: Not a valid link"
     if (res.status == 200) or (res.status == 304):
         conlen = res.getheader("content-length")
-        # print "Conlen? ", conlen
         if not conlen:
             conlen = "<Not found>"
         pingres = pingResult(netloc)
-        # print "Pingres? ", pingres
-        # geoip = geoIP(netloc)
-        # print "Geoip? ", geoip
-        return "Content length: " + conlen + " bytes\nping " + pingres
+        geoip = geoIP(netloc)
+        return "Content length: " + conlen + " bytes\nping " + pingres + geoip
     else:
         return "Error: HTTP Status " + str(res.status)
 
