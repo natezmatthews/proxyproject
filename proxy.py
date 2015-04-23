@@ -31,8 +31,18 @@ class Server:
 
 # Client class handles communication with the destination server
 class Client:
-    def __init__(self, host, port):
-        self.permhost = host
+    def __init__(self, request, port):
+        elems = request.split()
+        if len(elems) == 0:
+            sys.exit("Error: Request does not contain separatable words")
+        elif elems[0] != "GET":
+            sys.exit("Error: Proxy can only handle HTML GET requests")
+        elif elems[3] == "Host:":
+            host = elems[4]
+        else:
+            host = elems[1]
+
+        self.fullpath = elems[4] + elems[1]
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.client.connect((host, port))
@@ -49,7 +59,7 @@ class Client:
             if len(read) == 0:
                 break
             resp += read
-        return findLinks(resp, self.permhost)
+        return findLinks(resp, self.fullpath)
 
 def pingResult(netloc):
     try:
@@ -71,11 +81,14 @@ def geoIP(netloc):
     res = conn.getresponse()
     return res.read()
 
-def getLinkInfo(uri, hostname):
-    parsed = urlparse(uri)
+def getLinkInfo(uri, origuri):
+    parsed = urlparse.urlparse(uri)
     netloc = parsed.netloc
     if netloc == "":
-        netloc = hostname
+        i = origuri.find("http://") + 1
+        k = origuri.rfind("/")
+        netloc = origuri[i:k]
+        print "New netloc: ", netloc
 
     print "uri: ", uri
     print "parsed.netloc: ", parsed.netloc

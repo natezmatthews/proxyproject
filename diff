@@ -1,0 +1,188 @@
+$git diff
+diff --git a/client.py b/client.py
+index aafa924..b6d8f17 100644
+--- a/client.py
++++ b/client.py
+@@ -10,7 +10,7 @@ PORT = int(sys.argv[2])
+ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ s.connect((HOST,PORT))
+ 
+-req = ("GET /comp/112/assignments.html HTTP/1.1\nHost: www.cs.tufts.edu
++req = ("GET / HTTP/1.1\nHost: lucyq.github.io\r\n\r\n")
+ print req
+ s.send(req)
+ while 1:
+diff --git a/index.html b/index.html
+index 48768e7..8b429ef 100644
+--- a/index.html
++++ b/index.html
+@@ -15,11 +15,11 @@
+ <h1>COMP 112 Assignments</h1>
+ <div id="topnavbar">
+ <ul class="topnavlist">
+-<li><span title="Error: HTTP Status 404"><a href="index.html">COMP 112 
+-<li><span title="Error: HTTP Status 404"><a href="syllabus.html">Syllab
+-<li><span title="Error: HTTP Status 404"><a href="assignments.html">Ass
+-<li><span title="Error: HTTP Status 404"><a href="exams.html">Exams</a>
+-<li><span title="Error: HTTP Status 404"><a href="announcements.html">A
++<li><span title="Error: Not a valid link"><a href="index.html">COMP 112
++<li><span title="Error: Not a valid link"><a href="syllabus.html">Sylla
++<li><span title="Error: Not a valid link"><a href="assignments.html">As
++<li><span title="Error: Not a valid link"><a href="exams.html">Exams</a
++<li><span title="Error: Not a valid link"><a href="announcements.html">
+ <!--<li><a href="project.html">Project</a></li>-->
+ </ul>
+ </div>
+@@ -33,41 +33,41 @@
+ <th>Solutions</th>
+ </tr>
+ <tr>
+-<td>Programming: <span title="Error: HTTP Status 404"><a href="handouts
++<td>Programming: <span title="Error: Not a valid link"><a href="handout
+ <td>01/28/2015</td>
+ <td>02/09/2015</td>
+ <td></td>
+ <td></td>
+ </tr>
+ <tr>
+-<td>Programming: <span title="Error: HTTP Status 404"><a href="assignme
++<td>Programming: <span title="Error: Not a valid link"><a href="assignm
+ <td>02/13/2015</td>
+ <td>02/25/2015</td>
+ <td><span title="Content length: &lt;Not found&gt; bytes
+-ping round-trip min/avg/max/stddev = 51.870/53.478/55.353/1.434 ms
+$git diff proxy.py
+diff --git a/proxy.py b/proxy.py
+index c94847e..433b7b3 100644
+--- a/proxy.py
++++ b/proxy.py
+@@ -7,7 +7,7 @@ import sys
+ import json
+ import select
+ import httplib
+-from urllib.parse import urlparse
++import urlparse
+ import pexpect
+ from bs4 import BeautifulSoup
+ 
+@@ -31,8 +31,19 @@ class Server:
+ 
+ # Client class handles communication with the destination server
+ class Client:
+-    def __init__(self, host, port):
+-        self.permhost = host
++    def __init__(self, request, port):
++        elems = request.split()
++        if len(elems) == 0:
++            sys.exit("Error: Request does not contain separatable words
++        elif elems[0] != "GET":
++            sys.exit("Error: Proxy can only handle HTML GET requests")
++        elif elems[3] == "Host:":
++            host = elems[4]
++        else:
++            host = elems[1]
++
++        self.fullpath = elems[4] + elems[1]
++
+         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+         try:
+             self.client.connect((host, port))
+@@ -49,7 +60,7 @@ class Client:
+             if len(read) == 0:
+                 break
+             resp += read
+-        return findLinks(resp, self.permhost)
++        return findLinks(resp, self.fullpath)
+ 
+ def pingResult(netloc):
+     try:
+@@ -71,11 +82,14 @@ def geoIP(netloc):
+     res = conn.getresponse()
+     return res.read()
+ 
+-def getLinkInfo(uri, hostname):
+-    parsed = urlparse(uri)
++def getLinkInfo(uri, origuri):
++    parsed = urlparse.urlparse(uri)
+     netloc = parsed.netloc
+     if netloc == "":
+-        netloc = hostname
++        i = origuri.find("http://") + 1
++        k = origuri.rfind("/")
++        netloc = origuri[i:k]
++        print "New netloc: ", netloc
+ 
+     print "uri: ", uri
+     print "parsed.netloc: ", parsed.netloc
+@@ -83,10 +97,9 @@ def getLinkInfo(uri, hostname):
+     print "parsed.path: ", parsed.path
+     path = parsed.path
+     if path and (path[0] != "/"):
+-        uri = "http://" + netloc + "/" + path
++        uri = netloc + "/" + path
+ 
+     print "URI: ", uri
+-    print "Geturl: ", parsed.geturl()
+ 
+     conn = httplib.HTTPConnection(netloc)
+     try:
+@@ -108,27 +121,16 @@ def getLinkInfo(uri, hostname):
+         return "Error: HTTP Status " + str(res.status)
+diff --git a/proxy.py b/proxy.py
+index c94847e..433b7b3 100644
+--- a/proxy.py
++++ b/proxy.py
+@@ -7,7 +7,7 @@ import sys
+ import json
+ import select
+ import httplib
+-from urllib.parse import urlparse
++import urlparse
+ import pexpect
+ from bs4 import BeautifulSoup
+ 
+@@ -31,8 +31,19 @@ class Server:
+ 
+ # Client class handles communication with the destination server
+ class Client:
+-    def __init__(self, host, port):
+-        self.permhost = host
++    def __init__(self, request, port):
++        elems = request.split()
++        if len(elems) == 0:
++            sys.exit("Error: Request does not contain separatable words
++        elif elems[0] != "GET":
++            sys.exit("Error: Proxy can only handle HTML GET requests")
++        elif elems[3] == "Host:":
++            host = elems[4]
++        else:
++            host = elems[1]
++
++        self.fullpath = elems[4] + elems[1]
++
+         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+         try:
+             self.client.connect((host, port))
+@@ -49,7 +60,7 @@ class Client:
+             if len(read) == 0:
+                 break
+             resp += read
+-        return findLinks(resp, self.permhost)
++        return findLinks(resp, self.fullpath)
+ 
+ def pingResult(netloc):
+     try:
+@@ -71,11 +82,14 @@ def geoIP(netloc):
+     res = conn.getresponse()
+     return res.read()
+ 
+-def getLinkInfo(uri, hostname):
+-    parsed = urlparse(uri)
++def getLinkInfo(uri, origuri):
++    parsed = urlparse.urlparse(uri)
+     netloc = parsed.netloc
+     if netloc == "":
+-        netloc = hostname
++        i = origuri.find("http://") + 1
++        k = origuri.rfind("/")
++        netloc = origuri[i:k]
