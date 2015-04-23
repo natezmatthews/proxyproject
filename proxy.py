@@ -7,7 +7,7 @@ import sys
 import json
 import select
 import httplib
-from urllib.parse import urlparse
+import urlparse
 import pexpect
 from bs4 import BeautifulSoup
 
@@ -39,10 +39,15 @@ class Client:
             sys.exit("Error: Proxy can only handle HTML GET requests")
         elif elems[3] == "Host:":
             host = elems[4]
+            print "Client host: ", host
+            self.fullpath = elems[4] + elems[1]
+            print "Client fullpath: ", self.fullpath
         else:
             host = elems[1]
+            print "Client host: ", host
+            self.fullpath = elems[1]
+            print "Client fullpath: ", self.fullpath
 
-        self.fullpath = elems[4] + elems[1]
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.client.connect((host, port))
@@ -84,26 +89,40 @@ def geoIP(netloc):
 def getLinkInfo(uri, origuri):
     parsed = urlparse.urlparse(uri)
     netloc = parsed.netloc
+    print "Netloc:",netloc
     if netloc == "":
-        i = origuri.find("http://") + 1
-        k = origuri.rfind("/")
-        netloc = origuri[i:k]
-        print "New netloc: ", netloc
+        # CASE: Relative URI:
+        parsed2 = urlparse.urlparse("http://" + origuri)
+        netloc = parsed2.netloc
+        print "Updated netloc:",netloc
+        i = (origuri.index(netloc) + len(netloc))
+        k = origuri.rindex("/")
+        print "i, k:",i,k
+        path = parsed.path
+        if path and (path[0] != "/"):
+            path = "/" + path
+        forreq = origuri[i:k] + path
+        print "Forreq:",forreq
+    else:
+        # CASE: Absolute URI:
+        i = (uri.index(netloc) + len(netloc))
+        print "i:",i
+        forreq = uri[i:]
+        print "Forreq:",forreq
+    
+    # print "parsed.path: ", parsed.path
+    # path = parsed.path
+    # if path:
+    #     uri = "http://" + dapath
+    #     if(path[0] != "/"):
+    #         uri += "/"
+    #     uri += path
 
-    print "uri: ", uri
-    print "parsed.netloc: ", parsed.netloc
-    print "netloc: ", netloc
-    print "parsed.path: ", parsed.path
-    path = parsed.path
-    if path and (path[0] != "/"):
-        uri = "http://" + netloc + "/" + path
-
-    print "URI: ", uri
-    print "Geturl: ", parsed.geturl()
+    # print "HeadReq: ", uri
 
     conn = httplib.HTTPConnection(netloc)
     try:
-        conn.request("HEAD", uri)
+        conn.request("HEAD", forreq)
         res = conn.getresponse()
     except Exception, e:
         return "Error: Not a valid link"
@@ -121,26 +140,14 @@ def getLinkInfo(uri, origuri):
         return "Error: HTTP Status " + str(res.status)
 
 # findLinks function finds all HTML links in a document
-def findLinks(document, hostname):
+def findLinks(document, fullpath):
     soup = BeautifulSoup(document)
     for a in soup.findAll('a', href=True):
         span = soup.new_tag('span')
         a.replaceWith(span)
         span.insert(0, a)
-        span['title'] = getLinkInfo(a['href'], hostname)
+        span['title'] = getLinkInfo(a['href'], fullpath)
     return str(soup)
-
-def forwardAddress(request):
-    elems = request.split()
-    if len(elems) == 0:
-        sys.exit("Error: Request does not contain separatable words")
-    elif elems[0] != "GET":
-        sys.exit("Error: Proxy can only handle HTML GET requests")
-    elif elems[3] == "Host:":
-        return elems[4]
-    else:
-        print elems[4], elems[1]
-        return elems[1]
 
 if __name__ == '__main__':
     try:
@@ -153,7 +160,7 @@ if __name__ == '__main__':
         server = Server(hostname, portno)
         request = server.readFromClient()
         
-        client = Client(forwardAddress(request), 80)
+        client = Client(request, 80)
         client.sendToServer(request)
         resp = client.readFromServer()
         server.sendToClient(resp)
