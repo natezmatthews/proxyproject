@@ -89,7 +89,6 @@ def geoIP(netloc):
 def getLinkInfo(href, origuri):
     parsed = urlparse.urlparse(href)
     netloc = parsed.netloc
-    print "Netloc:",netloc
     if netloc == "":
         # CASE: Relative URI:
         parsed_origuri = urlparse.urlparse("http://" + origuri)
@@ -130,6 +129,7 @@ def findLinks(document, fullpath):
         a.replaceWith(span)
         span.insert(0, a)
         span['title'] = getLinkInfo(a['href'], fullpath)
+        print a, span['title']
     return str(soup)
 
 if __name__ == '__main__':
