@@ -154,18 +154,37 @@ def getLinkInfo(href, origuri):
 def findLinks(document, fullpath):
     soup = BeautifulSoup(document)
 
-    head = soup.find('head')
-    
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    head = soup.head
+
+
+    css_link = soup.new_tag('link')
+    css_link['rel'] = 'stylesheet'
+    css_link['href']= '//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'
+    head.append(css_link)
+
+    script_1 = soup.new_tag('script')
+    script_1['src'] = '//code.jquery.com/jquery-1.10.2.js'
+
+    script_2 = soup.new_tag('script')
+    script_2['src'] = '//code.jquery.com/ui/1.11.4/jquery-ui.js'
+
+    head.append(script_1)
+
+    # style = soup.new_tag('style')
+    # style.append()
+
+
+
+
+
 
 
     for a in soup.findAll('a', href=True):
-        span = soup.new_tag('span')
-        a.replaceWith(span)
-        span.insert(0, a)
-        span['title'] = getLinkInfo(a['href'], fullpath)
+        a['title'] = getLinkInfo(a['href'], fullpath)
+        # span = soup.new_tag('span')
+        # a.replaceWith(span)
+        # span.insert(0, a)
+        # span['title'] = getLinkInfo(a['href'], fullpath)
     return str(soup)
 
 if __name__ == '__main__':
