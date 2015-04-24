@@ -136,7 +136,11 @@ def getLinkInfo(href, origuri):
 
 # findLinks function finds all HTML links in a document
 def findLinks(document, fullpath):
-    soup = BeautifulSoup(document)
+    try:
+        soup = BeautifulSoup(document)
+    except Exception, e:
+        print "Exception: "
+        raise e
     for a in soup.findAll('a', href=True):
         span = soup.new_tag('span')
         a.replaceWith(span)
