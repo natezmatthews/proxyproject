@@ -23,11 +23,21 @@ req = ("GET " + DEST_PATH + " HTTP/1.1\nHost: " + DEST_HOST + "\r\n\r\n")
 print (req)
 s.send(req.encode('utf-8'))
 f = open("output.html","w")
+response = ''
+
+
 while 1:
-	response = (s.recv(BUFFER_SIZE)).decode('utf-8')
-	print("Receivd response, writing to file")
-	if len(response) > 0:
-		f.write(response)
+	buf = (s.recv(BUFFER_SIZE)).decode('utf-8')
+	# if len(response) > 0:
+	# 	f.write(response)
+	response += buf
+
+	if ('</html>' in buf):
+		break
+
+
+f.write(response[(response.index('<!DOCTYPE HTML>')):(len(response))])
+
 f.close()
 sys.exit("Done!")
 
