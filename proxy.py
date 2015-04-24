@@ -154,9 +154,8 @@ def getLinkInfo(href, origuri):
 def findLinks(document, fullpath):
     try:
         soup = BeautifulSoup(document)
-    except Exception, e:
-        print "Exception: "
-        raise e
+    except Exception as e:
+        print ("Exception: " + str(e))
 
     head = soup.head
     style = soup.new_tag('style')
