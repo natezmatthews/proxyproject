@@ -160,10 +160,10 @@ def findLinks(document, fullpath):
     head = soup.head
     style = soup.new_tag('style')
     style.append('*, *:before, *:after { -webkit-box-sizing: border-box; -moz-box-sizing:    border-box; box-sizing:         border-box;} body { margin: 0 auto; max-width: 640px; width: 90%; } body, button { font-family: "Helvetica Neue", Arial, sans-serif; } button { font-size: 100%; } a:hover { text-decoration: none; } header, .content, .content p { margin: 4em 0; text-align: center; } [data-tooltip] { position: relative; z-index: 2; cursor: pointer; } [data-tooltip]:before, [data-tooltip]:after {  visibility: hidden; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0); opacity: 0; pointer-events: none; } [data-tooltip]:before { position: absolute; bottom: 150%; left: 50%; margin-bottom: 5px; margin-left: -80px; padding: 7px; width: 160px; -webkit-border-radius: 3px; -moz-border-radius:    3px; border-radius: 3px; background-color: #000; background-color: hsla(0, 0%, 20%, 0.9); color: #fff; content: attr(data-tooltip); text-align: center; font-size: 14px; line-height: 1.2; } [data-tooltip]:after { position: absolute; bottom: 150%; left: 50%; margin-left: -5px; width: 0; border-top: 5px solid #000; border-top: 5px solid hsla(0, 0%, 20%, 0.9); border-right: 5px solid transparent; border-left: 5px solid transparent; content: " "; font-size: 0; line-height: 0; }  [data-tooltip]:hover:before, [data-tooltip]:hover:after { visibility: visible; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100); opacity: 1; }')
-    head.append(style)
+    # head.append(style)
 
     for a in soup.findAll('a', href=True):
-        a['data-tooltip'] = getLinkInfo(a['href'], fullpath)
+        a['title'] = getLinkInfo(a['href'], fullpath)
         # span = soup.new_tag('span')
         # a.replaceWith(span)
         # span.insert(0, a)
