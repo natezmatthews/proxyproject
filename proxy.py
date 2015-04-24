@@ -9,6 +9,7 @@ import json
 import select
 import http.client
 import re
+import time
 
 try: 
     from urllib.parse import urlparse
@@ -24,6 +25,7 @@ except ImportError:
 
 NUM_CLIENTS = 1
 BUFFER_SIZE = 4096
+DOWNLOAD_SPEED = 16250 #bytes per millisecond
 
 # Server class handles communication with the client
 class Server:
@@ -80,25 +82,25 @@ class Client:
             resp += read
         return findLinks(resp, self.fullpath)
 
-def pingResult(netloc):
-    try:
-        child = pexpect.spawn('ping -c 3 ' + netloc)
-    except Exception as e:
-        raise e
-    while 1:
-        cur = child.readline()
-        if not cur: break
-        prev = cur
-    return prev
+# def pingResult(netloc):
+#     try:
+#         child = pexpect.spawn('ping -c 3 ' + netloc)
+#     except Exception as e:
+#         raise e
+#     while 1:
+#         cur = child.readline()
+#         if not cur: break
+#         prev = cur
+#     return prev
 
-def geoIP(netloc):
-    try:
-        conn = http.client.HTTPConnection("freegeoip.net")
-    except Exception as e:
-        raise e
-    conn.request("GET", "/csv/" + netloc)
-    res = conn.getresponse()
-    return res.read()
+# def geoIP(netloc):
+#     try:
+#         conn = http.client.HTTPConnection("freegeoip.net")
+#     except Exception as e:
+#         raise e
+#     conn.request("GET", "/csv/" + netloc)
+#     res = conn.getresponse()
+#     return res.read()
 
 def getLinkInfo(href, origuri):
     parsed = urlparse(href)
@@ -130,8 +132,10 @@ def getLinkInfo(href, origuri):
 
     conn = http.client.HTTPConnection(netloc)
     try:
+        start = int(round(time.time() * 1000))
         conn.request("HEAD", forreq)
         res = conn.getresponse()
+        fin = int(round(time.time() * 1000))
     except Exception as e:
         return "Error: Not a valid link"
     print ("HTTP status: ", res.status) 
@@ -139,14 +143,14 @@ def getLinkInfo(href, origuri):
         conlen = res.getheader("content-length")
         print ("Content length: ", conlen)
         if not conlen:
-            conlen = "<Not found>"
+            conlen = 0
 
-        pingres = pingResult(netloc)
+        est = (fin - start) + (int(conlen) / DOWNLOAD_SPEED)
+        # pingres = pingResult(netloc)
         # geoip = geoIP(netloc)
-
-        return ("Content length: " + conlen + " bytes\nping " + pingres.decode('utf-8'))
-
+        # return ("Content length: " + conlen + " bytes\nping " + pingres.decode('utf-8') + geoip.decode('utf-8'))
         # return "Content length: " + conlen + " bytes\nping " + pingres + geoip
+        return ("Download Time Estimate: " + str(round(est,2)) + "ms")
     else:
         return "Error: HTTP Status " + str(res.status)
 
