@@ -27,16 +27,16 @@ response = ''
 
 
 while 1:
-	buf = (s.recv(BUFFER_SIZE)).decode('utf-8')
-	# if len(response) > 0:
-	# 	f.write(response)
-	response += buf
+	response = (s.recv(BUFFER_SIZE)).decode('utf-8')
+	if len(response) > 0:
+		f.write(response)
+	response += response
 
-	if ('</html>' in buf):
-		break
+	# if ('</html>' in response):
+	# 	break
 
 
-f.write(response[(response.index('<!DOCTYPE HTML>')):(len(response))])
+# f.write(response[(response.index('<!DOCTYPE HTML>')):(len(response))])
 
 f.close()
 sys.exit("Done!")
