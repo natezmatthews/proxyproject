@@ -1,0 +1,7 @@
+-Change metrics to propogation delay and transmission delay
+-Add timer to calculate propogation delay
+-Working tooltip
+-Time speed it takes for page to load
+-Write the report
+-Implement caching
+-Download speed: 146 mbps
